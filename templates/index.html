@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Resume Matcher</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo"><i class="fa-solid fa-robot"></i></div>
+            <h1>AI Resume Matcher</h1>
+            <p>Smart Resume Screening &amp; Candidate Ranking</p>
+        </header>
+
+        <form method="POST" enctype="multipart/form-data" id="resume-form">
+            <section class="card">
+                <h2><i class="fa-solid fa-cloud-arrow-up"></i> Upload Resume Files</h2>
+                <label class="upload-box" for="resumes">
+                    <input type="file" id="resumes" name="resumes" multiple accept=".pdf,application/pdf" required>
+                    <div class="upload-content">
+                        <i class="fa-solid fa-file-arrow-up"></i>
+                        <h3>Choose Resume PDFs</h3>
+                        <p>Click here to browse (maximum 10 PDF files)</p>
+                    </div>
+                </label>
+                <div id="file-preview">
+                    <p id="file-count">No files selected</p>
+                    <ul id="file-list"></ul>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2><i class="fa-solid fa-briefcase"></i> Job Description</h2>
+                <textarea name="job_desc" rows="8" placeholder="Example: Looking for a Java Full Stack Developer with Spring Boot, SQL, React, REST API, Git and problem solving skills." required>{{ job_desc }}</textarea>
+            </section>
+
+            <div class="bottom">
+                <div class="top-box">
+                    <label for="top_x"><i class="fa-solid fa-ranking-star"></i> Top Candidates</label>
+                    <input type="number" id="top_x" name="top_x" value="{{ top_x }}" min="1" max="10" required>
+                </div>
+                <button type="submit" id="submit-button">
+                    <i class="fa-solid fa-magnifying-glass"></i> Analyze Resumes
+                </button>
+            </div>
+        </form>
+
+        {% if message %}
+        <div class="message" role="status">
+            <i class="fa-solid fa-circle-info"></i> {{ message }}
+        </div>
+        {% endif %}
+
+        {% if results %}
+        <section class="results">
+            <h2><i class="fa-solid fa-trophy"></i> Top Matching Candidates</h2>
+            {% for r in results %}
+            <article class="result-card">
+                <div class="result-top">
+                    <div class="resume-info">
+                        <h3><i class="fa-solid fa-file-lines"></i> {{ r.name }}</h3>
+                        <p class="resume-text">{{ r.note if r.note else "Resume analysis completed" }}</p>
+                    </div>
+                    <div class="score">{{ r.score }}%</div>
+                </div>
+
+                <div class="progress" aria-label="Skill match score">
+                    <div class="progress-fill" style="width: {{ r.score }}%;"></div>
+                </div>
+
+                <div class="skills">
+                    <h4><i class="fa-solid fa-lightbulb"></i> Matched Skills</h4>
+                    <div class="skill-container">
+                        {% if r.matched_skills %}
+                            {% for skill in r.matched_skills %}
+                            <span class="skill">{{ skill }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <span class="no-skills">No skills matched</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </section>
+        {% endif %}
+
+        <footer>
+            <hr>
+            <p><i class="fa-solid fa-code"></i> Developed using Flask · Python · HTML · CSS · JavaScript</p>
+            <p>AI Resume Screening System</p>
+            <p class="disclaimer">This tool matches keywords and is not a substitute for human resume review.</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
